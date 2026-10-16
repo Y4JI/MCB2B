@@ -1,0 +1,22 @@
+# .NET build artifacts
+bin/
+obj/
+
+# Visual Studio / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+
+# Node & Tailwind CLI
+node_modules/
+tailwindcss.exe
+tailwindcss-windows-*.exe
+
+# OS generated
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+.DS_Store
