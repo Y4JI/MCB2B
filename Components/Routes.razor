@@ -1,6 +1,18 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
+<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(Layout.MainLayout)">
+            <div class="py-20 max-w-lg mx-auto text-center px-4">
+                <div class="mc-card p-8 border-gray-700 bg-gray-900">
+                    <h1 class="text-4xl font-black text-amber-400 font-mono mb-2">404</h1>
+                    <h2 class="text-lg font-bold text-white mb-2">Lost in the Nether?</h2>
+                    <p class="text-xs text-gray-400 mb-6">The realm waypoint you requested does not exist on Aetheria.</p>
+                    <a href="" class="mc-button-primary text-xs py-2 px-6">Return to Spawn (Home)</a>
+                </div>
+            </div>
+        </LayoutView>
+    </NotFound>
 </Router>
