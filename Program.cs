@@ -6,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// In-memory demo services
+builder.Services.AddSingleton<MCB2B.Services.AccountStore>();
+builder.Services.AddScoped<MCB2B.Services.SessionState>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
