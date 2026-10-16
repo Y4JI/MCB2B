@@ -1,0 +1,166 @@
+@page "/profile"
+@inject SessionState SessionState
+@inject AccountStore AccountStore
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>Aetheria Network | Player Profile</PageTitle>
+
+<div class="py-12 max-w-2xl mx-auto px-4 sm:px-6">
+    @if (SessionState.IsLoggedIn && SessionState.CurrentUser != null)
+    {
+        <div class="mc-card p-8 border-gray-700 bg-gray-900 shadow-2xl">
+            <!-- Profile Header -->
+            <div class="flex items-center space-x-4 pb-6 border-b border-gray-800 mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center font-mono font-black text-2xl text-gray-950 shadow-lg shadow-amber-950/40">
+                    @SessionState.CurrentUser.Username.Substring(0, 1).ToUpper()
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-2xl font-black text-white font-mono">@SessionState.CurrentUser.Username</h1>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                            Verified Player
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">@SessionState.CurrentUser.Email &bull; Member since @SessionState.CurrentUser.CreatedAt.ToString("MMM yyyy")</p>
+                </div>
+            </div>
+
+            <!-- Profile Summary Stats -->
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                    <div class="text-[11px] font-mono uppercase tracking-wider text-gray-400">Account Type</div>
+                    <div class="text-base font-bold text-white mt-1">Standard Adventurer</div>
+                </div>
+                <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                    <div class="text-[11px] font-mono uppercase tracking-wider text-gray-400">Unlocked Ranks</div>
+                    <div class="text-base font-bold text-amber-400 mt-1 font-mono">
+                        @(SessionState.CurrentUser.OwnedRanks.Count > 0 ? string.Join(", ", SessionState.CurrentUser.OwnedRanks.Select(r => r.ToUpper())) : "None Yet")
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Profile Section -->
+            <div class="pt-2">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300 font-mono mb-4 flex items-center space-x-2">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <span>Update Account Information</span>
+                </h2>
+
+                @if (!string.IsNullOrEmpty(_successMessage))
+                {
+                    <div class="mb-5 p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/50 text-xs text-emerald-200 flex items-start space-x-2">
+                        <svg class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span>@_successMessage</span>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="mb-5 p-3 rounded-lg bg-red-950/50 border border-red-500/50 text-xs text-red-200 flex items-start space-x-2">
+                        <svg class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>@_errorMessage</span>
+                    </div>
+                }
+
+                <EditForm Model="_editModel" OnValidSubmit="HandleUpdateProfile">
+                    <DataAnnotationsValidator />
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="profileUsername" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 font-mono">
+                                Minecraft Username (IGN)
+                            </label>
+                            <InputText id="profileUsername"
+                                       @bind-Value="_editModel.Username"
+                                       class="w-full px-3.5 py-2.5 rounded-lg bg-gray-950 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-amber-400 transition-colors" />
+                            <ValidationMessage For="@(() => _editModel.Username)" class="text-xs text-red-400 mt-1 block" />
+                        </div>
+
+                        <div>
+                            <label for="profileEmail" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 font-mono">
+                                Email Address
+                            </label>
+                            <InputText id="profileEmail"
+                                       type="email"
+                                       @bind-Value="_editModel.Email"
+                                       class="w-full px-3.5 py-2.5 rounded-lg bg-gray-950 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-amber-400 transition-colors" />
+                            <ValidationMessage For="@(() => _editModel.Email)" class="text-xs text-red-400 mt-1 block" />
+                        </div>
+
+                        <div class="pt-2 flex items-center space-x-3">
+                            <button type="submit" 
+                                    class="mc-button-primary py-2.5 px-6 text-sm font-bold">
+                                Save Profile Changes
+                            </button>
+                            <NavLink href="dashboard" class="mc-button-secondary text-xs py-2.5 px-4">
+                                Return to Dashboard
+                            </NavLink>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private ProfileEditModel _editModel = new();
+    private string? _successMessage;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        if (!SessionState.IsLoggedIn || SessionState.CurrentUser == null)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        SessionState.OnChange += StateHasChanged;
+        PopulateEditModel();
+    }
+
+    private void PopulateEditModel()
+    {
+        if (SessionState.CurrentUser != null)
+        {
+            _editModel.Username = SessionState.CurrentUser.Username;
+            _editModel.Email = SessionState.CurrentUser.Email;
+        }
+    }
+
+    private void HandleUpdateProfile()
+    {
+        _successMessage = null;
+        _errorMessage = null;
+
+        if (SessionState.CurrentUser == null) return;
+
+        var currentUsername = SessionState.CurrentUser.Username;
+        var newUsername = _editModel.Username.Trim();
+        var newEmail = _editModel.Email.Trim();
+
+        var success = AccountStore.UpdateProfile(currentUsername, newUsername, newEmail, out var error);
+        if (!success)
+        {
+            _errorMessage = error ?? "Failed to update profile.";
+            return;
+        }
+
+        // Update session state so header and other components reflect changes immediately
+        SessionState.UpdateProfile(newUsername, newEmail);
+        _successMessage = "Profile updated successfully! Changes are reflected immediately in your active session.";
+    }
+
+    public void Dispose()
+    {
+        SessionState.OnChange -= StateHasChanged;
+    }
+}

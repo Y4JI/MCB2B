@@ -1,0 +1,90 @@
+@page "/dashboard"
+@inject SessionState SessionState
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>Aetheria Network | Player Dashboard</PageTitle>
+
+<div class="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    @if (SessionState.IsLoggedIn && SessionState.CurrentUser != null)
+    {
+        <!-- Welcome Hero Banner -->
+        <div class="mc-card p-8 border-gray-700 bg-gradient-to-r from-gray-900 via-[#141923] to-gray-900 mb-10 relative overflow-hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div>
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center font-mono font-black text-xl text-gray-950 shadow-lg shadow-amber-950/40">
+                            @SessionState.CurrentUser.Username.Substring(0, 1).ToUpper()
+                        </div>
+                        <div>
+                            <span class="text-xs font-mono font-bold uppercase tracking-wider text-amber-400">Player Station</span>
+                            <h1 class="text-2xl sm:text-4xl font-black text-white font-mono">
+                                Welcome, @SessionState.CurrentUser.Username!
+                            </h1>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-400 max-w-2xl mt-1 leading-relaxed">
+                        Manage your server journey, review recommended rank upgrades, and expand your realm perks across Aetheria Network.
+                    </p>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <NavLink href="store" class="mc-button-primary text-sm py-2.5 px-5 shadow-lg shadow-amber-950/40">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        Browse Store
+                    </NavLink>
+                    <NavLink href="profile" class="mc-button-secondary text-xs py-2.5 px-4">
+                        Edit Profile
+                    </NavLink>
+                </div>
+            </div>
+        </div>
+
+        <!-- Store Overview & Recommended Tiers -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-white font-mono flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                    <span>Recommended Rank Upgrades</span>
+                </h2>
+                <p class="text-xs text-gray-400 mt-1">Highlighted tiers curated for active survival and skyblock players</p>
+            </div>
+            <NavLink href="store" class="text-xs font-semibold text-amber-400 hover:text-amber-300 font-mono flex items-center space-x-1">
+                <span>View All 6 Server Ranks</span>
+                <span>&rarr;</span>
+            </NavLink>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            @foreach (var rank in RecommendedRanks)
+            {
+                <RankCard Rank="rank"
+                          OnViewDetails="@(() => Navigation.NavigateTo("store"))"
+                          OnBuyNow="@(() => Navigation.NavigateTo("store"))" />
+            }
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!SessionState.IsLoggedIn)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        SessionState.OnChange += StateHasChanged;
+    }
+
+    private IEnumerable<RankProduct> RecommendedRanks =>
+        RankCatalog.Ranks.Where(r => r.Id is "vanguard" or "overlord" or "celestial");
+
+    public void Dispose()
+    {
+        SessionState.OnChange -= StateHasChanged;
+    }
+}
