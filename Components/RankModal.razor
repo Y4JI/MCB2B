@@ -1,0 +1,309 @@
+@namespace MCB2B.Components
+@inject SessionState SessionState
+@inject AccountStore AccountStore
+
+@if (IsOpen && Rank != null)
+{
+    <!-- Backdrop with click-to-close -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+         @onclick="Close">
+        
+        <!-- Modal Container (Stop propagation so clicking inside doesn't close) -->
+        <div class="mc-card w-full max-w-xl max-h-[90vh] overflow-y-auto border border-gray-700 bg-gray-900 shadow-2xl shadow-black relative"
+             @onclick:stopPropagation="true">
+            
+            <!-- Close Button Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-800 bg-gray-950/60">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-gray-300">
+                        @GetStepTitle()
+                    </span>
+                </div>
+                <button @onclick="Close" 
+                        class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition-colors focus:ring-2 focus:ring-amber-400"
+                        title="Close modal"
+                        aria-label="Close modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Content Based on Current Step -->
+            <div class="p-6">
+                @if (CurrentStep == ModalStep.Details)
+                {
+                    <!-- STEP 1: DETAILS -->
+                    <div>
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-bold border @Rank.BadgeBgClass @Rank.BadgeTextClass mb-2">
+                                    @Rank.PrefixTag
+                                </span>
+                                <h3 class="text-2xl font-black text-white font-mono">@Rank.Name Rank</h3>
+                                <p class="text-xs text-gray-400 mt-1">Tier @Rank.Tier of 6 &bull; Permanent Lifetime Server Status</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black text-white font-mono">$@Rank.Price.ToString("0.00")</div>
+                                <div class="text-[11px] text-gray-400">USD One-Time</div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-gray-300 mb-6 bg-gray-950/50 p-3 rounded-lg border border-gray-800 leading-relaxed">
+                            @Rank.ShortDescription
+                        </p>
+
+                        <div class="mb-6">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 font-mono">Full Rank Privileges & Perks:</h4>
+                            <ul class="space-y-2.5">
+                                @foreach (var perk in Rank.Perks)
+                                {
+                                    <li class="flex items-start space-x-2.5 text-xs text-gray-200 bg-gray-950/30 p-2 rounded border border-gray-800/60">
+                                        <svg class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span>@perk</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mb-6 text-xs bg-gray-950/40 p-3 rounded-lg border border-gray-800">
+                            <div>
+                                <span class="text-gray-400">Homes Allowed:</span>
+                                <span class="ml-1 text-white font-mono font-semibold">@Rank.HomeLimit</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Coin Booster:</span>
+                                <span class="ml-1 text-amber-400 font-mono font-semibold">@Rank.CoinMultiplier</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Vault Chests:</span>
+                                <span class="ml-1 text-white font-mono font-semibold">@Rank.VaultChests</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">Queue Priority:</span>
+                                <span class="ml-1 text-emerald-400 font-semibold">@(Rank.PriorityQueue ? "Granted" : "None")</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 pt-4 border-t border-gray-800">
+                            <button @onclick="AdvanceToConfirmationOrLogin" 
+                                    class="flex-1 py-3 px-4 rounded-lg font-bold text-sm @Rank.ButtonClass transition-all active:scale-[0.98]">
+                                Proceed to Purchase ($@Rank.Price.ToString("0.00"))
+                            </button>
+                            <button @onclick="Close" 
+                                    class="py-3 px-4 rounded-lg font-medium text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 transition-colors">
+                                Back
+                            </button>
+                        </div>
+                    </div>
+                }
+                else if (CurrentStep == ModalStep.Confirmation)
+                {
+                    <!-- STEP 2: ORDER CONFIRMATION SUMMARY -->
+                    <div>
+                        <div class="text-center mb-6">
+                            <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-black text-white font-mono">Confirm Simulated Purchase</h3>
+                            <p class="text-xs text-gray-400 mt-1">Review your order details before final simulated confirmation</p>
+                        </div>
+
+                        <!-- Order Item Card -->
+                        <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 mb-5">
+                            <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono font-bold border @Rank.BadgeBgClass @Rank.BadgeTextClass">
+                                        @Rank.PrefixTag
+                                    </span>
+                                    <div>
+                                        <div class="font-bold text-white text-sm">@Rank.Name Rank (Lifetime)</div>
+                                        <div class="text-[11px] text-gray-400">Target User: <span class="text-amber-400 font-mono font-semibold">@SessionState.CurrentUser?.Username</span></div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-base font-black text-white font-mono">$@Rank.Price.ToString("0.00")</div>
+                                    <div class="text-[10px] text-gray-400">USD</div>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 space-y-1.5 text-xs">
+                                <div class="flex justify-between text-gray-400">
+                                    <span>Subtotal:</span>
+                                    <span class="font-mono text-gray-200">$@Rank.Price.ToString("0.00")</span>
+                                </div>
+                                <div class="flex justify-between text-gray-400">
+                                    <span>Taxes & Processing:</span>
+                                    <span class="font-mono text-emerald-400">$0.00 (Demo)</span>
+                                </div>
+                                <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-gray-800/80">
+                                    <span>Total Due:</span>
+                                    <span class="font-mono text-amber-400">$@Rank.Price.ToString("0.00") USD</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mandatory Demo Disclaimer Warning Box -->
+                        <div class="bg-amber-950/30 border border-amber-600/40 rounded-xl p-3.5 mb-6 text-xs text-amber-200/90 flex items-start space-x-3">
+                            <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p class="leading-relaxed">
+                                <strong>Simulation Notice:</strong> Clicking "Confirm Purchase" is completely simulated. <strong>No real payment was processed, no credit card is charged, and no actual Minecraft rank is granted.</strong>
+                            </p>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <button @onclick="ProcessPurchase" 
+                                    class="flex-1 py-3 px-4 rounded-lg font-bold text-sm bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-950/40 transition-all active:scale-[0.98]">
+                                Confirm Purchase ($@Rank.Price.ToString("0.00"))
+                            </button>
+                            <button @onclick="() => CurrentStep = ModalStep.Details" 
+                                    class="py-3 px-4 rounded-lg font-medium text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 transition-colors">
+                                Back
+                            </button>
+                        </div>
+                    </div>
+                }
+                else if (CurrentStep == ModalStep.Success)
+                {
+                    <!-- STEP 3: ORDER SUCCESS -->
+                    <div class="text-center py-2">
+                        <div class="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-4 animate-bounce">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+
+                        <h3 class="text-2xl font-black text-white font-mono mb-1">Order Simulated Successfully!</h3>
+                        <p class="text-xs text-emerald-400 font-semibold mb-6">Simulated checkout complete</p>
+
+                        <!-- Order Summary Receipt Box -->
+                        <div class="bg-gray-950 p-5 rounded-xl border border-gray-800 text-left mb-6 font-mono text-xs space-y-2.5">
+                            <div class="flex justify-between items-center pb-2 border-b border-gray-800">
+                                <span class="text-gray-400">Order Reference:</span>
+                                <span class="text-amber-400 font-bold bg-amber-950/50 px-2 py-0.5 rounded border border-amber-800">@OrderReference</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Purchased Tier:</span>
+                                <span class="text-white font-semibold">@Rank.Name (@Rank.PrefixTag)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Amount Simulated:</span>
+                                <span class="text-white font-semibold">$@Rank.Price.ToString("0.00") USD</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Recipient Account:</span>
+                                <span class="text-cyan-400">@SessionState.CurrentUser?.Username</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Timestamp:</span>
+                                <span class="text-gray-400">@DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") UTC</span>
+                            </div>
+                        </div>
+
+                        <!-- Important Disclaimer Notice -->
+                        <div class="p-3.5 bg-gray-950/80 rounded-xl border border-gray-800 text-[11px] text-gray-400 leading-relaxed mb-6">
+                            <span class="text-amber-400 font-semibold">Notice:</span> This was a simulated checkout test. <strong>No real payment was processed and no Minecraft rank was actually granted on any server.</strong>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <button @onclick="Close" 
+                                    class="flex-1 mc-button-primary py-2.5 text-sm">
+                                Return to Store
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public enum ModalStep
+    {
+        Details = 1,
+        Confirmation = 2,
+        Success = 3
+    }
+
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public RankProduct? Rank { get; set; }
+
+    [Parameter]
+    public ModalStep CurrentStep { get; set; } = ModalStep.Details;
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback OnRequireLogin { get; set; }
+
+    private string OrderReference { get; set; } = string.Empty;
+
+    public void OpenAtStep(RankProduct rank, ModalStep step)
+    {
+        Rank = rank;
+        CurrentStep = step;
+        IsOpen = true;
+        StateHasChanged();
+    }
+
+    private void AdvanceToConfirmationOrLogin()
+    {
+        if (SessionState.IsLoggedIn)
+        {
+            CurrentStep = ModalStep.Confirmation;
+        }
+        else
+        {
+            OnRequireLogin.InvokeAsync();
+        }
+    }
+
+    private void ProcessPurchase()
+    {
+        if (Rank != null && SessionState.CurrentUser != null)
+        {
+            // Generate ORD- followed by random 6-character uppercase alphanumeric string
+            OrderReference = "ORD-" + GenerateOrderCode(6);
+            
+            // Record simulated purchase in SessionState and AccountStore
+            SessionState.AddRank(Rank.Id);
+            AccountStore.AddRankToAccount(SessionState.CurrentUser.Username, Rank.Id);
+
+            CurrentStep = ModalStep.Success;
+        }
+    }
+
+    private static string GenerateOrderCode(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    private string GetStepTitle() => CurrentStep switch
+    {
+        ModalStep.Details => "Rank Details & Overview",
+        ModalStep.Confirmation => "Step 2: Confirm Order",
+        ModalStep.Success => "Step 3: Order Completed",
+        _ => "Rank Store"
+    };
+
+    private void Close()
+    {
+        IsOpen = false;
+        OnClose.InvokeAsync();
+    }
+}

@@ -1,0 +1,92 @@
+@page "/store"
+@inject SessionState SessionState
+@inject NavigationManager Navigation
+
+<PageTitle>Aetheria Network | Server Ranks Store</PageTitle>
+
+<div class="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Store Header Banner -->
+    <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-3">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+            </svg>
+            <span>Lifetime Server Status &bull; Instant Delivery</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight font-mono mb-4">
+            Aetheria Rank Store
+        </h1>
+        <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+            Upgrade your player status to unlock exclusive cosmetics, expanded home teleports, ender vaults, and permanent server economy multipliers.
+        </p>
+
+        <!-- Prominent Simulation Notice -->
+        <div class="mt-6 inline-flex items-center space-x-2 px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-xs text-gray-400">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>All ranks and prices are <strong>fictional demonstration data</strong>. No actual payments are processed.</span>
+        </div>
+    </div>
+
+    <!-- Ranks Grid (6 Tiers) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        @foreach (var rank in RankCatalog.Ranks)
+        {
+            <RankCard Rank="rank"
+                      OnViewDetails="HandleViewDetails"
+                      OnBuyNow="HandleBuyNow" />
+        }
+    </div>
+
+    <!-- Comparison Section -->
+    <div class="mt-12 mb-8">
+        <RankComparison />
+    </div>
+
+    <!-- 3-Step Store Modal -->
+    <RankModal @ref="_modal"
+               IsOpen="_isModalOpen"
+               Rank="_selectedRank"
+               CurrentStep="_modalStep"
+               OnClose="HandleModalClose"
+               OnRequireLogin="HandleRequireLogin" />
+</div>
+
+@code {
+    private RankModal? _modal;
+    private bool _isModalOpen;
+    private RankProduct? _selectedRank;
+    private RankModal.ModalStep _modalStep = RankModal.ModalStep.Details;
+
+    private void HandleViewDetails(RankProduct rank)
+    {
+        _selectedRank = rank;
+        _modalStep = RankModal.ModalStep.Details;
+        _isModalOpen = true;
+    }
+
+    private void HandleBuyNow(RankProduct rank)
+    {
+        if (SessionState.IsLoggedIn)
+        {
+            _selectedRank = rank;
+            _modalStep = RankModal.ModalStep.Confirmation;
+            _isModalOpen = true;
+        }
+        else
+        {
+            // Redirect to login with required message
+            Navigation.NavigateTo("/login?message=login_required");
+        }
+    }
+
+    private void HandleRequireLogin()
+    {
+        _isModalOpen = false;
+        Navigation.NavigateTo("/login?message=login_required");
+    }
+
+    private void HandleModalClose()
+    {
+        _isModalOpen = false;
+    }
+}

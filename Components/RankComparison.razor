@@ -1,0 +1,140 @@
+@namespace MCB2B.Components
+
+<div class="mc-card p-6 border-minecraft-border overflow-hidden">
+    <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h3 class="text-xl font-bold text-white font-mono flex items-center space-x-2">
+                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Tier Privilege Matrix</span>
+            </h3>
+            <p class="text-xs text-gray-400 mt-1">Detailed perk breakdown across all six server tiers</p>
+        </div>
+        <div class="text-xs text-gray-400 font-mono">
+            All ranks include permanent lifetime server perks
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+            <thead>
+                <tr class="border-b border-gray-800 bg-gray-900/60">
+                    <th class="py-3 px-4 font-mono font-bold text-gray-400 uppercase tracking-wider">Perk Feature</th>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <th class="py-3 px-3 text-center font-mono font-bold text-gray-200">
+                            <span class="inline-block px-2 py-0.5 rounded text-[11px] border @rank.BadgeBgClass @rank.BadgeTextClass">
+                                @rank.Name
+                            </span>
+                            <div class="text-gray-400 text-[10px] mt-1">$@rank.Price.ToString("0.00")</div>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/60">
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">Home Waypoints (/sethome)</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center font-mono text-gray-300">@rank.HomeLimit</td>
+                    }
+                </tr>
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">Server Economy Multiplier</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center font-mono text-amber-400">@rank.CoinMultiplier</td>
+                    }
+                </tr>
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">Priority Login Queue</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center">
+                            @if (rank.PriorityQueue)
+                            {
+                                <span class="text-emerald-400 font-bold">&#10003;</span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-600">&minus;</span>
+                            }
+                        </td>
+                    }
+                </tr>
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">Keep EXP on Death</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center">
+                            @if (rank.KeepExpOnDeath)
+                            {
+                                <span class="text-emerald-400 font-bold">&#10003;</span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-600">&minus;</span>
+                            }
+                        </td>
+                    }
+                </tr>
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">End-Chest Vault Capacity</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center font-mono text-gray-300">@rank.VaultChests</td>
+                    }
+                </tr>
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">Flight (/fly in Hubs)</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center">
+                            @if (rank.FlyAccess)
+                            {
+                                <span class="text-purple-400 font-bold">&#10003;</span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-600">&minus;</span>
+                            }
+                        </td>
+                    }
+                </tr>
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">Custom Nickname (/nick)</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center">
+                            @if (rank.CustomNick)
+                            {
+                                <span class="text-cyan-400 font-bold">&#10003;</span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-600">&minus;</span>
+                            }
+                        </td>
+                    }
+                </tr>
+                <tr class="hover:bg-gray-800/30 transition-colors">
+                    <td class="py-3 px-4 font-medium text-gray-300">Private Realm / World Access</td>
+                    @foreach (var rank in RankCatalog.Ranks)
+                    {
+                        <td class="py-3 px-3 text-center">
+                            @if (rank.PrivateWorld)
+                            {
+                                <span class="text-red-400 font-bold">&#10003;</span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-600">&minus;</span>
+                            }
+                        </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
