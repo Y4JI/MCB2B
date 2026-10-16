@@ -1,23 +1,59 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div class="min-h-screen flex flex-col bg-minecraft-dark text-gray-100 selection:bg-amber-500/30 selection:text-amber-200">
+    <NavMenu />
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
+    <main class="flex-grow">
+        @Body
     </main>
-</div>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+    <footer class="mt-auto border-t border-minecraft-border bg-[#0b0e14] py-8 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <!-- Col 1: Server Info -->
+                <div>
+                    <div class="flex items-center space-x-2 font-mono font-bold text-white text-base mb-3">
+                        <span class="w-3 h-3 rounded-sm bg-amber-500 inline-block"></span>
+                        <span>AETHERIA NETWORK</span>
+                    </div>
+                    <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                        A fictional custom Minecraft RPG and Skyblock server concept built for sprint demonstration. Experience our tiered perks, cosmetics, and server boosts.
+                    </p>
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 bg-gray-900 border border-gray-800 rounded text-xs font-mono text-gray-300">
+                        <span class="text-amber-400">Server IP:</span>
+                        <span>play.aetheria.net</span>
+                    </div>
+                </div>
+
+                <!-- Col 2: Navigation Links -->
+                <div>
+                    <h3 class="text-xs uppercase font-bold tracking-wider text-gray-300 mb-3 font-mono">Quick Navigation</h3>
+                    <ul class="space-y-2 text-xs text-gray-400">
+                        <li><a href="" class="hover:text-amber-400 transition-colors">Server Home & Lore</a></li>
+                        <li><a href="store" class="hover:text-amber-400 transition-colors">Rank Store & Perks</a></li>
+                        <li><a href="dashboard" class="hover:text-amber-400 transition-colors">Player Dashboard</a></li>
+                        <li><a href="login" class="hover:text-amber-400 transition-colors">Account Portal</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Prominent Demo Disclaimer -->
+                <div class="p-4 rounded-xl bg-amber-950/20 border border-amber-600/30">
+                    <div class="flex items-center space-x-2 text-amber-400 font-semibold text-xs uppercase tracking-wider mb-2">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span>Demo Simulation Notice</span>
+                    </div>
+                    <p class="text-[11px] text-amber-200/80 leading-relaxed">
+                        This store is a functional C# Blazor demonstration. All ranks, pricing, currency, and purchases are strictly fictional. <strong>No actual payment is accepted and no real Minecraft server connectivity exists.</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-800/80 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
+                <p>&copy; @DateTime.UtcNow.Year Aetheria Network. Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</p>
+                <p class="mt-2 md:mt-0 font-mono text-[11px]">Powered by .NET 8 Blazor Interactive Server & Tailwind CSS</p>
+            </div>
+        </div>
+    </footer>
 </div>
