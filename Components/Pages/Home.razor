@@ -1,7 +1,145 @@
-﻿@page "/"
+@page "/"
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Aetheria Network | Official Minecraft Server Store</PageTitle>
 
-<h1>Hello, world!</h1>
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-12 pb-20 border-b border-minecraft-border bg-gradient-to-b from-[#111722] via-minecraft-dark to-minecraft-dark">
+    <!-- Ambient glow decorative layers -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-br from-amber-500/10 via-purple-600/10 to-cyan-500/10 blur-3xl pointer-events-none rounded-full"></div>
 
-Welcome to your new app.
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center max-w-3xl mx-auto">
+            <!-- Badge -->
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-gray-900/90 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-6 shadow-inner">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Season 7 Now Live &bull; RPG Realms & Custom Dungeons</span>
+            </div>
+
+            <!-- Main Heading -->
+            <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight mb-6 font-mono">
+                Ascend Your Journey on <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-yellow-500">Aetheria</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-gray-300 leading-relaxed mb-8">
+                Unlock exclusive cosmetic halos, private vault storage, teleport waypoints, and economy boosters across all survival and RPG realms. Keep the adventure thriving with lifetime ranks.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <NavLink href="store" class="mc-button-primary text-base py-3 px-8 shadow-lg shadow-amber-950/50">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    Explore Server Ranks
+                </NavLink>
+
+                <div class="flex items-center space-x-2 px-4 py-3 rounded-lg bg-gray-900 border border-gray-800 text-gray-300 text-sm font-mono">
+                    <span class="text-gray-400">Server IP:</span>
+                    <span class="text-amber-400 font-bold select-all">play.aetheria.net</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Server Statistics -->
+        <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div class="mc-card p-4 text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono">1,428+</div>
+                <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">Active Players</div>
+            </div>
+            <div class="mc-card p-4 text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono">6 Tiers</div>
+                <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">Custom Ranks</div>
+            </div>
+            <div class="mc-card p-4 text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">100%</div>
+                <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">Instant Activation</div>
+            </div>
+            <div class="mc-card p-4 text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-purple-400 font-mono">48,000+</div>
+                <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">Adventurers</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Ranks Section -->
+<section class="py-16 bg-minecraft-dark">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-amber-500 mb-2 font-mono">Highlighted Tiers</h2>
+            <p class="text-3xl font-black text-white tracking-tight font-mono">Most Popular Player Upgrades</p>
+            <p class="text-gray-400 text-sm mt-3">
+                From essential survival conveniences to supreme server patron status, discover our community's top rank choices.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            @foreach (var rank in FeaturedRanks)
+            {
+                <RankCard Rank="rank"
+                          OnViewDetails="@(() => Navigation.NavigateTo("store"))"
+                          OnBuyNow="@(() => Navigation.NavigateTo("store"))" />
+            }
+        </div>
+
+        <div class="mt-10 text-center">
+            <NavLink href="store" class="mc-button-secondary text-sm py-2.5 px-6">
+                View All 6 Server Ranks & Full Comparison &rarr;
+            </NavLink>
+        </div>
+    </div>
+</section>
+
+<!-- Community & Benefits Section -->
+<section class="py-16 border-t border-minecraft-border bg-[#0f141c]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-2 font-mono">Server Advantages</h2>
+            <p class="text-3xl font-black text-white tracking-tight font-mono">Why Support Aetheria Network?</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="mc-card p-6 border-gray-800 hover:border-gray-700">
+                <div class="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2 font-mono">Expedited Queue & Server Priority</h3>
+                <p class="text-gray-400 text-xs leading-relaxed">
+                    Bypass peak-hour waitlists and jump straight into your favorite realm instances with dedicated priority queue slots.
+                </p>
+            </div>
+
+            <div class="mc-card p-6 border-gray-800 hover:border-gray-700">
+                <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2 font-mono">Cosmetics & Chat Prestige</h3>
+                <p class="text-gray-400 text-xs leading-relaxed">
+                    Custom prismatic chat prefixes, personal particle trails, custom nicknames (/nick), and distinctive server join broadcasts.
+                </p>
+            </div>
+
+            <div class="mc-card p-6 border-gray-800 hover:border-gray-700">
+                <div class="w-12 h-12 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2 font-mono">Extra Homes & Vault Capacity</h3>
+                <p class="text-gray-400 text-xs leading-relaxed">
+                    Expand your exploration horizons with up to unlimited /sethome locations and high-capacity portable ender vaults.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private IEnumerable<RankProduct> FeaturedRanks =>
+        RankCatalog.Ranks.Where(r => r.Id is "knight" or "vanguard" or "celestial");
+}
