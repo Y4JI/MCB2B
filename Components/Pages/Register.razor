@@ -1,0 +1,135 @@
+@page "/register"
+@inject SessionState SessionState
+@inject AccountStore AccountStore
+@inject NavigationManager Navigation
+
+<PageTitle>Aetheria Network | Player Registration</PageTitle>
+
+<div class="py-16 max-w-md mx-auto px-4 sm:px-6">
+    <div class="mc-card p-8 border-gray-700 bg-gray-900 shadow-2xl">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-black text-white font-mono">Create Player Account</h1>
+            <p class="text-xs text-gray-400 mt-1">Register to manage your server rank privileges</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="mb-5 p-3 rounded-lg bg-red-950/50 border border-red-500/50 text-xs text-red-200 flex items-start space-x-2">
+                <svg class="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>@_errorMessage</span>
+            </div>
+        }
+
+        <!-- Registration Form -->
+        <EditForm Model="_registerModel" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+
+            <div class="space-y-4">
+                <div>
+                    <label for="regUsername" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 font-mono">
+                        Minecraft IGN / Username
+                    </label>
+                    <InputText id="regUsername" 
+                               @bind-Value="_registerModel.Username"
+                               class="w-full px-3.5 py-2.5 rounded-lg bg-gray-950 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-amber-400 transition-colors"
+                               placeholder="e.g. ShadowKnight99" />
+                    <ValidationMessage For="@(() => _registerModel.Username)" class="text-xs text-red-400 mt-1 block" />
+                </div>
+
+                <div>
+                    <label for="regEmail" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 font-mono">
+                        Email Address
+                    </label>
+                    <InputText id="regEmail" 
+                               type="email"
+                               @bind-Value="_registerModel.Email"
+                               class="w-full px-3.5 py-2.5 rounded-lg bg-gray-950 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-amber-400 transition-colors"
+                               placeholder="player@example.com" />
+                    <ValidationMessage For="@(() => _registerModel.Email)" class="text-xs text-red-400 mt-1 block" />
+                </div>
+
+                <div>
+                    <label for="regPassword" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 font-mono">
+                        Password
+                    </label>
+                    <InputText id="regPassword" 
+                               type="password"
+                               @bind-Value="_registerModel.Password"
+                               class="w-full px-3.5 py-2.5 rounded-lg bg-gray-950 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-amber-400 transition-colors"
+                               placeholder="Min. 6 characters" />
+                    <ValidationMessage For="@(() => _registerModel.Password)" class="text-xs text-red-400 mt-1 block" />
+                </div>
+
+                <div>
+                    <label for="regConfirmPassword" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 font-mono">
+                        Confirm Password
+                    </label>
+                    <InputText id="regConfirmPassword" 
+                               type="password"
+                               @bind-Value="_registerModel.ConfirmPassword"
+                               class="w-full px-3.5 py-2.5 rounded-lg bg-gray-950 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-amber-400 transition-colors"
+                               placeholder="Re-enter password" />
+                    <ValidationMessage For="@(() => _registerModel.ConfirmPassword)" class="text-xs text-red-400 mt-1 block" />
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" 
+                            class="w-full mc-button-primary py-2.5 text-sm font-bold tracking-wide">
+                        Create Account & Enter
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+
+        <!-- Login Link -->
+        <div class="mt-6 pt-6 border-t border-gray-800 text-center text-xs text-gray-400">
+            Already registered?
+            <NavLink href="login" class="text-amber-400 hover:text-amber-300 font-semibold ml-1">
+                Sign in here &rarr;
+            </NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterModel _registerModel = new();
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        if (SessionState.IsLoggedIn)
+        {
+            Navigation.NavigateTo("/dashboard");
+        }
+    }
+
+    private void HandleRegister()
+    {
+        _errorMessage = null;
+
+        var success = AccountStore.Register(
+            _registerModel.Username.Trim(),
+            _registerModel.Email.Trim(),
+            _registerModel.Password,
+            out var error,
+            out var createdAccount);
+
+        if (!success || createdAccount == null)
+        {
+            _errorMessage = error ?? "Failed to create account. Please try again.";
+            return;
+        }
+
+        // Automatic login upon registration as specified in brief
+        SessionState.Login(createdAccount);
+        Navigation.NavigateTo("/dashboard");
+    }
+}
